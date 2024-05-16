@@ -20,6 +20,7 @@ public:
     void retiraVertices();
     void retiraArestas();
     void matrizAdjacencia();
+    void listaAdjacencia();
     
 };
 
@@ -96,6 +97,29 @@ void Grafo::matrizAdjacencia() {
     for (int i = 0; i < vertices.size(); i++) {
         for (int j = 0; j < vertices.size(); j++) {
             cout << matriz[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+/**
+ * Função que imprime a lista de adjacência
+*/
+void Grafo::listaAdjacencia() {
+    vector <vector<int>> listaAdjacencia(vertices.size());
+    for (int i = 0; i < vertices.size(); i++) {
+        for (int j = 0; j < arestas.size(); j++) {
+            if (arestas[j].first == vertices[i]) {
+                listaAdjacencia[i].push_back(arestas[j].second);
+            }
+        }
+    }
+
+    cout << "Lista de Adjacência: " << endl;
+    for (int i = 0; i < vertices.size(); i++) {
+        cout << vertices[i] << ": ";
+        for (int j = 0; j < listaAdjacencia[i].size(); j++) {
+            cout << listaAdjacencia[i][j] << " ";
         }
         cout << endl;
     }
@@ -238,8 +262,9 @@ int main()
 
     grafo.retiraVertices();
     grafo.retiraArestas();
-
     grafo.matrizAdjacencia();
+    grafo.listaAdjacencia();
+
 
     menu();
 
