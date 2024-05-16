@@ -78,6 +78,30 @@ void Grafo::retiraArestas() {
 }
 
 /**
+ * Função que imprime a matriz de adjacência
+*/
+void Grafo::matrizAdjacencia() {
+    int matriz[vertices.size()][vertices.size()];
+    for (int i = 0; i < vertices.size(); i++) {
+        for (int j = 0; j < vertices.size(); j++) {
+            matriz[i][j] = 0;
+        }
+    }
+
+    for (int i = 0; i < arestas.size(); i++) {
+        matriz[arestas[i].first - 1][arestas[i].second - 1] = 1;
+    }
+
+    cout << "Matriz de Adjacência: " << endl;
+    for (int i = 0; i < vertices.size(); i++) {
+        for (int j = 0; j < vertices.size(); j++) {
+            cout << matriz[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+/**
  * Leitura do grafo V = {1,2,3,4,5}; A = {(1,2),(2,3),(3,1),(4,5)}; em arquivo txt separando
  * os vértices por vírgula e as arestas por ponto e vírgula
  */
@@ -214,6 +238,8 @@ int main()
 
     grafo.retiraVertices();
     grafo.retiraArestas();
+
+    grafo.matrizAdjacencia();
 
     menu();
 
