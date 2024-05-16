@@ -1,10 +1,98 @@
 #include <iostream>
+#include <fstream>
+#include <vector>
 
 using namespace std;
 
-/*Leitura do grafo V = {1,2,3,4,5}; A = {(1,2),(2,3),(3,1),(4,5)}; em arquivo txt */
-void leitura
+/**
+ * Estrutura de dados para representar um grafo
+*/
+class Grafo
+{
+private:
+    string textoGrafo; // Texto do grafo
+    int V; // Número de vértices
+    vector <int> vertices; // Vetor de vértices
+    vector <pair<int, int>> arestas; // Vetor de arestas
+public:
+    Grafo(string texto);
+    ~Grafo();
+    void retiraVertices();
+    void retiraArestas();
+    void matrizAdjacencia();
+    
+};
 
+Grafo::Grafo(string textoGrafo)
+{
+    this->textoGrafo = textoGrafo;
+}
+
+Grafo::~Grafo()
+{
+}
+
+
+/**
+ * Função que retira os vertices de uma string 1,2,3,4,5 e armazena em um vetor
+*/
+void Grafo::retiraVertices() {
+    string verticeRetirado = textoGrafo.substr(textoGrafo.find("V = {") + 5, textoGrafo.find("};") - textoGrafo.find("V = {") - 5);
+    string vertice;
+    
+    for (int i = 0; i < verticeRetirado.size(); i++) {
+        if (verticeRetirado[i] != ',' && verticeRetirado[i] != ';') {
+            vertice += verticeRetirado[i];
+            vertices.push_back(stoi(vertice));
+            vertice = "";
+        }
+    }
+
+    cout << "Vértices: ";
+    for (int i = 0; i < vertices.size(); i++) {
+        cout << vertices[i] << " ";
+    }
+}
+
+/**
+ * Função que retira as arestas de uma string (1,2),(2,3),(3,1),(4,5) e armazena em um vetor
+*/
+void Grafo::retiraArestas() {
+    string arestasRetiradas = textoGrafo.substr(textoGrafo.find("A = {") + 5, textoGrafo.find(")};") - textoGrafo.find("A = {") - 4);
+    
+    string aresta;
+    for (int i = 0; i < arestasRetiradas.size(); i++) {
+        if (arestasRetiradas[i] != ',' && arestasRetiradas[i] != ';') {
+            aresta += arestasRetiradas[i];
+            if (aresta.size() == 4) {
+                arestas.push_back(make_pair(stoi(aresta.substr(1, 1)), stoi(aresta.substr(2, 1))));
+                aresta = "";
+            }
+        }
+    }
+
+    cout << "Arestas: ";
+    for (int i = 0; i < arestas.size(); i++) {
+        cout << "(" << arestas[i].first << "," << arestas[i].second << ") ";
+    }
+}
+
+/**
+ * Leitura do grafo V = {1,2,3,4,5}; A = {(1,2),(2,3),(3,1),(4,5)}; em arquivo txt separando
+ * os vértices por vírgula e as arestas por ponto e vírgula
+ */
+string leituraArquivo() {
+    ifstream arquivo;
+    string linha, vertice, aresta;
+    arquivo.open("grafo.txt");
+    if (arquivo.is_open()) {
+        getline(arquivo, linha);
+        arquivo.close();
+    } else {
+        cout << "Não foi possível abrir o arquivo!" << endl;
+    }
+    return linha;
+}
 
 /**
 * Função que imprime o menu de opções
@@ -121,6 +209,11 @@ void menu() {
 
 int main()
 {
+
+    Grafo grafo(leituraArquivo());
+
+    grafo.retiraVertices();
+    grafo.retiraArestas();
 
     menu();
 
