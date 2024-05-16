@@ -2,13 +2,17 @@
 
 using namespace std;
 
+/*Leitura do grafo V = {1,2,3,4,5}; A = {(1,2),(2,3),(3,1),(4,5)}; em arquivo txt */
+void leitura
+
+
 /**
 * Função que imprime o menu de opções
 */
 void menuDeOpcoes() {
 
     cout << " ############ Menu: ############ " << endl;
-    
+
     cout << "a. Representações: " << endl;
     cout << "   i.Matriz de Adjacência" << endl;
     cout << "   ii.Lista de Adjacência" << endl;
@@ -45,6 +49,7 @@ void menuDeOpcoes() {
 void menu() {
 
     char opcao;
+    string opcao2;
     bool loop = true;
 
     while (loop) {
@@ -52,26 +57,65 @@ void menu() {
         cout << "Digite a opção desejada: ";
         cin >> opcao;
 
+
         switch(opcao) {
             case 'a':
                 cout << "a. Representações: " << endl;
+                cin >> opcao2;
+                if (opcao2 == "i") {
+                    cout << "i.Matriz de Adjacência" << endl;
+                } else if (opcao2 == "ii") {
+                    cout << "ii.Lista de Adjacência" << endl;
+                } else {
+                    cout << "Opção inválida!" << endl;
+                }
                 break;
+
             case 'b':
                 cout << "b. Remoções e Inserções" << endl;
+                cin >> opcao2;
+                if (opcao2 == "i") {
+                    cout << "i.Arestas" << endl;
+                    cin >> opcao2;
+                    if (opcao2 == "1") {
+                        cout << "1. Remover" << endl;
+                    } else if (opcao2 == "2") {
+                        cout << "2. Adicionar" << endl;
+                    } else {
+                        cout << "Opção inválida!" << endl;
+                    }
+                } else if (opcao2 == "ii") {
+                    cout << "ii.Vértices" << endl;
+                    cin >> opcao2;
+                    if (opcao2 == "1") {
+                        cout << "1. Remover" << endl;
+                    } else if (opcao2 == "2") {
+                        cout << "2. Adicionar" << endl;
+                    } else {
+                        cout << "Opção inválida!" << endl;
+                    }
+                } else {
+                    cout << "Opção inválida!" << endl;
+                }
                 break;
+
             case 'c':
                 cout << "c. Verificações" << endl;
                 break;
+
             case 'd':
                 cout << "d. Árvores" << endl;
                 break;
+            
+            case 's':
+                cout << "Saindo..." << endl;
+                loop = false;
+                break;
+                
             default:
                 cout << "Opção inválida!" << endl;
         }
 
-        if (opcao == 's') {
-            loop = false;
-        }
     }
 }
 
