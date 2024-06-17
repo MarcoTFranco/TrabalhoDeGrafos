@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <queue>
 
 using namespace std;
 
@@ -21,6 +22,7 @@ private:
     void retiraArestas();
     void listaAdjacencia(); // Função que faz uma lista de adjacência
     void matrizAdjacencia(); // Função que faz uma matriz de adjacência
+    bool auxiliarBipartido(int v, int c, vector<int>& color);
 
 public:
     Grafo(string texto);
@@ -28,6 +30,8 @@ public:
     int getQtdVertices();
     int getQtdArestas();
     bool conexo();
+    bool bipartido();
+    
 };
 
 Grafo::Grafo(string textoGrafo)
@@ -143,6 +147,39 @@ void Grafo::matrizAdjacencia() {
     }
 }
 
+/**
+ * Função auxiliar para verificar se o grafo é bipartido
+*/
+bool Grafo::auxiliarBipartido(int v, int c, vector<int>& color) {
+    color[v] = c; // atribua cor c a v
+
+    for (int u : listaDeAdjacencia[v]) { // para cada vizinho u de v
+        if (color[u] == c) {
+            return false; // se algum vizinho colorido de v tem cor c, então diga não
+        }
+        if (color[u] == -1 && !auxiliarBipartido(u, 1 - c, color)) {
+            return false; // se A(w, 1−c) diz não para algum vizinho incolor w de v, então diga não
+        }
+    }
+
+    return true; // diga sim
+}
+
+/**
+ * Função que verifica se o grafo é bipartido
+*/
+bool Grafo::bipartido() {
+    int n = listaDeAdjacencia.size();
+    vector<int> color(n, -1); // -1 representa cor não visitada
+
+    for (int i = 0; i < n; ++i) {
+        if (color[i] == -1 && !auxiliarBipartido(i, 0, color)) {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 /**
  * Função que faz uma lista de adjacência
@@ -243,6 +280,11 @@ void menu() {
                     }
                 } else if (opcao2 == "d") {
                     cout << "d. Bipartido" << endl;
+                    if (grafo.bipartido()) {
+                        cout << "O grafo e bipartido!" << endl;
+                    } else {
+                        cout << "O grafo nao e bipartido!" << endl;
+                    }
                 } else if (opcao2 == "e") {
                     cout << "e. Euleriano" << endl;
                 } else if (opcao2 == "f") {
