@@ -17,21 +17,28 @@ private:
     vector <int> vertices; // Vetor de vértices
     vector <pair<int, int>> arestas; // Vetor de arestas
     vector <vector<int>> listaDeAdjacencia; // Lista de adjacência
+    vector <vector<int>> matrizDeAdjacencia; // Matriz de adjacência
 
     void retiraVertices();
     void retiraArestas();
+    bool auxiliarBipartido(int v, int c, vector<int>& color);
     void listaAdjacencia(); // Função que faz uma lista de adjacência
     void matrizAdjacencia(); // Função que faz uma matriz de adjacência
-    bool auxiliarBipartido(int v, int c, vector<int>& color);
 
 public:
     Grafo(string texto);
     ~Grafo();
+    //1
     int getQtdVertices();
     int getQtdArestas();
     bool conexo();
     bool bipartido();
-    
+    //2
+    void listarVertices();
+    void listarArestas();
+    //3
+    void imprimirMatrizAdjacencia();
+    void imprimirListaAdjacencia();
 };
 
 Grafo::Grafo(string textoGrafo)
@@ -39,6 +46,8 @@ Grafo::Grafo(string textoGrafo)
     this->textoGrafo = textoGrafo;
     retiraVertices();
     retiraArestas();
+    listaAdjacencia();
+    matrizAdjacencia();
     
 }
 
@@ -135,16 +144,13 @@ bool Grafo::conexo() {
  * Função que faz uma matriz de adjacência
 */
 void Grafo::matrizAdjacencia() {
-    int matriz[vertices.size()][vertices.size()];
-    for (int i = 0; i < (int) vertices.size(); i++) {
-        for (int j = 0; j < (int) vertices.size(); j++) {
-            matriz[i][j] = 0;
-        }
-    }
+    matrizDeAdjacencia.resize(vertices.size(), vector<int>(vertices.size(), 0));
 
     for (int i = 0; i < (int) arestas.size(); i++) {
-        matriz[arestas[i].first - 1][arestas[i].second - 1] = 1;
+        matrizDeAdjacencia[arestas[i].first - 1][arestas[i].second - 1] = 1;
+        matrizDeAdjacencia[arestas[i].second - 1][arestas[i].first - 1] = 1;
     }
+
 }
 
 /**
@@ -196,6 +202,53 @@ void Grafo::listaAdjacencia() {
 }
 
 /**
+ * Função que lista os vértices
+*/
+void Grafo::listarVertices() {
+    for (int i = 0; i < (int) vertices.size(); i++) {
+        cout << vertices[i] << " ";
+    }
+    cout << endl;
+}
+
+/**
+ * Função que lista as arestas
+*/
+void Grafo::listarArestas() {
+    for (int i = 0; i < (int) arestas.size(); i++) {
+        cout << "(" << arestas[i].first << "," << arestas[i].second << ") ";
+    }
+    cout << endl;
+}
+
+/**
+ * Função que imprime a matriz de adjacência
+*/
+void Grafo::imprimirMatrizAdjacencia() {
+
+    for (int i = 0; i < (int) matrizDeAdjacencia.size(); i++) {
+        for (int j = 0; j < (int) matrizDeAdjacencia[i].size(); j++) {
+            cout << matrizDeAdjacencia[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+/**
+ * Função que imprime a lista de adjacência
+*/
+void Grafo::imprimirListaAdjacencia() {
+
+    for (int i = 0; i < (int) listaDeAdjacencia.size(); i++) {
+        cout << vertices[i] << ": ";
+        for (int j = 0; j < (int) listaDeAdjacencia[i].size(); j++) {
+            cout << listaDeAdjacencia[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+/**
  * Leitura do grafo V = {1,2,3,4,5}; A = {(1,2),(2,3),(3,1),(4,5)}; em arquivo txt separando
  * os vértices por vírgula e as arestas por ponto e vírgula
  */
@@ -216,6 +269,8 @@ string leituraArquivo() {
 * Função que imprime o menu de opções
 */
 void menuDeOpcoes() {
+    cout << endl;
+    cout << "Menu de opcoes" << endl;
     cout << "1. Verificar" << endl;
     cout << "   a. Quantidade de vertices" << endl;
     cout << "   b. Quantidade de arestas" << endl;
@@ -243,6 +298,8 @@ void menuDeOpcoes() {
     cout << "   g. Caminho minimo entre dois vertices (Esta funcao nao fica disponivel em grafos nao ponderados)" << endl;
     cout << "   h. Fluxo maximo (Esta funcao nao fica disponivel em grafos nao ponderados)" << endl;
     cout << "   i. Fechamento transitivo (Esta funcao nao fica disponivel em grafos nao ponderados)" << endl;
+    cout << "4. Sair" << endl;
+    cout << endl;
 }
 
 /**
@@ -302,9 +359,11 @@ void menu() {
                 cin >> opcao2;
                 if (opcao2 == "a") {
                     cout << "a. Vertices" << endl;
+                    grafo.listarVertices();
                     cout << endl;
                 } else if (opcao2 == "b") {
                     cout << "b. Arestas" << endl;
+                    grafo.listarArestas();
                     cout << endl;
                 } else if (opcao2 == "c") {
                     cout << "c. Componentes conexas" << endl;
@@ -326,8 +385,10 @@ void menu() {
                 cin >> opcao2;
                 if (opcao2 == "a") {
                     cout << "a. Matriz de adjacencia" << endl;
+                    grafo.imprimirMatrizAdjacencia();
                 } else if (opcao2 == "b") {
                     cout << "b. Lista de adjacencia" << endl;
+                    grafo.imprimirListaAdjacencia();
                 } else if (opcao2 == "c") {
                     cout << "c. Arvore de profundidade" << endl;
                 } else if (opcao2 == "d") {
@@ -347,7 +408,7 @@ void menu() {
                 }
                 break;
 
-            case 's':
+            case '4':
                 cout << "Saindo..." << endl;
                 loop = false;
                 break;
