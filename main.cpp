@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <queue>
+#include <stack>
 
 using namespace std;
 
@@ -24,6 +25,7 @@ private:
     bool auxiliarBipartido(int v, int c, vector<int>& color);
     void listaAdjacencia(); // Função que faz uma lista de adjacência
     void matrizAdjacencia(); // Função que faz uma matriz de adjacência
+    void dfs(int v, vector<bool>& visitado); // Função que faz uma busca em profundidade
 
 public:
     Grafo(string texto);
@@ -33,6 +35,7 @@ public:
     int getQtdArestas();
     bool conexo();
     bool bipartido();
+    bool euleriano();
     //2
     void listarVertices();
     void listarArestas();
@@ -54,6 +57,8 @@ Grafo::Grafo(string textoGrafo)
 Grafo::~Grafo()
 {
 }
+
+
 
 /**
  * Função que retira os vertices de uma string 1,2,3,4,5 e armazena em um vetor
@@ -94,6 +99,33 @@ void Grafo::retiraArestas() {
 }
 
 /**
+ * Função que faz uma matriz de adjacência
+*/
+void Grafo::matrizAdjacencia() {
+    matrizDeAdjacencia.resize(vertices.size(), vector<int>(vertices.size(), 0));
+
+    for (int i = 0; i < (int) arestas.size(); i++) {
+        matrizDeAdjacencia[arestas[i].first - 1][arestas[i].second - 1] = 1;
+        matrizDeAdjacencia[arestas[i].second - 1][arestas[i].first - 1] = 1;
+    }
+
+}
+
+/**
+ * Função que faz uma lista de adjacência
+*/
+void Grafo::listaAdjacencia() {
+    listaDeAdjacencia.resize(vertices.size());
+    for (int i = 0; i < (int) vertices.size(); i++) {
+        for (int j = 0; j < (int) arestas.size(); j++) {
+            if (arestas[j].first == vertices[i]) {
+                listaDeAdjacencia[i].push_back(arestas[j].second);
+            }
+        }
+    }
+}
+
+/**
  * Função que retorna a quantidade de arestas
 */
 int Grafo::getQtdVertices() {
@@ -108,49 +140,41 @@ int Grafo::getQtdArestas() {
 }
 
 /**
- * Função que verifica se o grafo é conexo
+ * Função que faz uma busca em profundidade
 */
-bool Grafo::conexo() {
-
-    listaAdjacencia();
-
-    vector <bool> visitados(vertices.size(), false);
-    vector <int> pilha;
-    pilha.push_back(vertices[0]);
-    visitados[0] = true;
+void Grafo::dfs(int v, vector<bool>& visitado) {
+    stack<int> pilha;
+    pilha.push(v);
 
     while (!pilha.empty()) {
-        int vertice = pilha.back();
-        pilha.pop_back();
+        int vertice = pilha.top();
+        pilha.pop();
 
-        for (int i = 0; i < (int) listaDeAdjacencia[vertice - 1].size(); i++) {
-            if (!visitados[listaDeAdjacencia[vertice - 1][i] - 1]) {
-                pilha.push_back(listaDeAdjacencia[vertice - 1][i]);
-                visitados[listaDeAdjacencia[vertice - 1][i] - 1] = true;
+        if (!visitado[vertice]) {
+            visitado[vertice] = true;
+
+            for (int u : listaDeAdjacencia[vertice - 1]) { // Ajuste aqui
+                if (!visitado[u]) {
+                    pilha.push(u);
+                }
             }
         }
     }
-
-    for (int i = 0; i < (int) visitados.size(); i++) {
-        if (!visitados[i]) {
-            return false;
-        }
-    }
-
-    return true;
 }
 
 /**
- * Função que faz uma matriz de adjacência
+ * Função que verifica se o grafo é conexo
 */
-void Grafo::matrizAdjacencia() {
-    matrizDeAdjacencia.resize(vertices.size(), vector<int>(vertices.size(), 0));
+bool Grafo::conexo() {
+    vector<bool> visitado(qtdVertices + 1, false);
+    dfs(vertices[0], visitado);
 
-    for (int i = 0; i < (int) arestas.size(); i++) {
-        matrizDeAdjacencia[arestas[i].first - 1][arestas[i].second - 1] = 1;
-        matrizDeAdjacencia[arestas[i].second - 1][arestas[i].first - 1] = 1;
+    for (int i = 1; i <= qtdVertices; i++) {
+        if (!visitado[i]) {
+            return false;
+        }
     }
-
+    return true;
 }
 
 /**
@@ -188,18 +212,26 @@ bool Grafo::bipartido() {
 }
 
 /**
- * Função que faz uma lista de adjacência
+ * Função que verifica se o grafo é euleriano
 */
-void Grafo::listaAdjacencia() {
-    listaDeAdjacencia.resize(vertices.size());
-    for (int i = 0; i < (int) vertices.size(); i++) {
-        for (int j = 0; j < (int) arestas.size(); j++) {
-            if (arestas[j].first == vertices[i]) {
-                listaDeAdjacencia[i].push_back(arestas[j].second);
-            }
+bool Grafo::euleriano() {
+    if (!conexo()) {
+        return false;
+    }
+
+    for (int i = 0; i < (int) matrizDeAdjacencia.size(); i++) {
+        int grau = 0;
+        for (int j = 0; j < (int) matrizDeAdjacencia[i].size(); j++) {
+            grau += matrizDeAdjacencia[i][j];
+        }
+        if (grau % 2 != 0) {
+            return false;
         }
     }
+
+    return true;
 }
+
 
 /**
  * Função que lista os vértices
@@ -344,6 +376,11 @@ void menu() {
                     }
                 } else if (opcao2 == "e") {
                     cout << "e. Euleriano" << endl;
+                    if (grafo.euleriano()) {
+                        cout << "O grafo e euleriano!" << endl;
+                    } else {
+                        cout << "O grafo nao e euleriano!" << endl;
+                    }
                 } else if (opcao2 == "f") {
                     cout << "f. Hamiltoniano" << endl;
                 } else if (opcao2 == "g") {
