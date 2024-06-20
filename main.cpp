@@ -3,6 +3,7 @@
 #include <vector>
 #include <queue>
 #include <stack>
+#include <algorithm>
 
 using namespace std;
 
@@ -22,10 +23,13 @@ private:
 
     void retiraVertices();
     void retiraArestas();
-    bool auxiliarBipartido(int v, int c, vector<int>& color);
+    bool auxiliarBipartido(int v, int c, vector<int>& color); // Função auxiliar para verificar se o grafo é bipartido
     void listaAdjacencia(); // Função que faz uma lista de adjacência
     void matrizAdjacencia(); // Função que faz uma matriz de adjacência
+    bool verificaCicloHamiltoniano(int v, vector<bool>& visitado, vector<int>& caminho, int pos); // Função que verifica se o grafo é hamiltoniano
     void dfs(int v, vector<bool>& visitado); // Função que faz uma busca em profundidade
+    void bfs(int v, vector<bool>& visitado); // Função que faz uma busca em largura
+
 
 public:
     Grafo(string texto);
@@ -36,6 +40,7 @@ public:
     bool conexo();
     bool bipartido();
     bool euleriano();
+    bool hamiltoniano();
     //2
     void listarVertices();
     void listarArestas();
@@ -57,8 +62,6 @@ Grafo::Grafo(string textoGrafo)
 Grafo::~Grafo()
 {
 }
-
-
 
 /**
  * Função que retira os vertices de uma string 1,2,3,4,5 e armazena em um vetor
@@ -153,9 +156,29 @@ void Grafo::dfs(int v, vector<bool>& visitado) {
         if (!visitado[vertice]) {
             visitado[vertice] = true;
 
-            for (int u : listaDeAdjacencia[vertice - 1]) { // Ajuste aqui
+            for (int u : listaDeAdjacencia[vertice - 1]) {
                 if (!visitado[u]) {
                     pilha.push(u);
+                }
+            }
+        }
+    }
+}
+
+void Grafo::bfs(int v, vector<bool>& visitado) {
+    queue<int> fila;
+    fila.push(v);
+
+    while (!fila.empty()) {
+        int vertice = fila.front();
+        fila.pop();
+
+        if (!visitado[vertice]) {
+            visitado[vertice] = true;
+
+            for (int u : listaDeAdjacencia[vertice - 1]) {
+                if (!visitado[u]) {
+                    fila.push(u);
                 }
             }
         }
@@ -232,6 +255,45 @@ bool Grafo::euleriano() {
     return true;
 }
 
+/**
+ * Função que verifica se o grafo é hamiltoniano
+*/
+bool Grafo::verificaCicloHamiltoniano(int v, vector<bool>& visitado, vector<int>& caminho, int pos) {
+    if (pos == qtdVertices) {
+        // Verifica se o último vértice está conectado ao primeiro
+        if (find(listaDeAdjacencia[v-1].begin(), listaDeAdjacencia[v-1].end(), caminho[0]) != listaDeAdjacencia[v-1].end()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    for (int u : listaDeAdjacencia[v-1]) {
+        if (!visitado[u-1]) {
+            visitado[u-1] = true;
+            caminho[pos] = u;
+
+            if (verificaCicloHamiltoniano(u, visitado, caminho, pos + 1)) {
+                return true;
+            }
+
+            visitado[u-1] = false;
+        }
+    }
+
+    return false;
+}
+
+bool Grafo::hamiltoniano() {
+    vector<bool> visitado(qtdVertices, false);
+    vector<int> caminho(qtdVertices, -1);
+
+    // Inicia do vértice 1 (ou qualquer vértice inicial)
+    visitado[0] = true;
+    caminho[0] = 1;
+
+    return verificaCicloHamiltoniano(1, visitado, caminho, 1);
+}
 
 /**
  * Função que lista os vértices
@@ -383,6 +445,11 @@ void menu() {
                     }
                 } else if (opcao2 == "f") {
                     cout << "f. Hamiltoniano" << endl;
+                    if (grafo.hamiltoniano()) {
+                        cout << "O grafo e hamiltoniano!" << endl;
+                    } else {
+                        cout << "O grafo nao e hamiltoniano!" << endl;
+                    }
                 } else if (opcao2 == "g") {
                     cout << "g. Ciclico" << endl;
                 } else if (opcao2 == "h") {
